@@ -1,974 +1,327 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>NUNA Restaurant · Powered by ZYNK</title>
-<meta name="description" content="NUNA Restaurant digital guest experience, powered by ZYNK." />
-<meta name="theme-color" content="#111310" />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ZYNK · Un toque. Todo conectado.</title>
 <style>
-  :root{
-    --ink:#111310;
-    --ink-soft:#2A2D26;
-    --paper:#FFFFFF;
-    --paper-alt:#F6F7F2;
-    --line:#E7E9E2;
-    --muted:#6E7268;
-    --muted-2:#9BA093;
-    --lime:#CFFF3E;
-    --lime-deep:#A8D620;
-    --shadow-soft: 0 1px 2px rgba(17,19,16,0.04), 0 8px 24px rgba(17,19,16,0.06);
-    --shadow-lift: 0 12px 32px rgba(17,19,16,0.14);
-    --radius-lg: 24px;
-    --radius-md: 16px;
-    --radius-sm: 12px;
-  }
-
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    font-family:'Inter',system-ui,-apple-system,sans-serif;
-    background:var(--ink);
-    background-image:
-      radial-gradient(circle at 20% 0%, #1B1E17 0%, #0B0C0A 55%),
-      radial-gradient(circle at 90% 100%, rgba(207,255,62,0.05) 0%, transparent 40%);
-    color:var(--ink);
-    min-height:100vh;
-    -webkit-font-smoothing:antialiased;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    overscroll-behavior-y:none;
-  }
-  body.modal-open{overflow:hidden;}
-  h1,h2,h3,.display{
-    font-family:'Space Grotesk',system-ui,sans-serif;
-    letter-spacing:-0.01em;
-  }
-  button{font-family:inherit;}
-  button:focus-visible, a:focus-visible, [tabindex]:focus-visible{
-    outline:2px solid var(--lime);
-    outline-offset:2px;
-    border-radius:8px;
-  }
-  img{max-width:100%;display:block;}
-
-  /* App shell: full-bleed on mobile, floating device-like card on larger screens */
-  .stage{
-    width:100%;
-    display:flex;
-    justify-content:center;
-    padding:0;
-  }
-  .app{
-    width:100%;
-    max-width:430px;
-    background:var(--paper);
-    min-height:100vh;
-    position:relative;
-    overflow:hidden;
-  }
-  @media (min-width:560px){
-    body{padding:40px 20px;}
-    .app{
-      min-height:auto;
-      border-radius:36px;
-      box-shadow:var(--shadow-lift), 0 0 0 1px rgba(255,255,255,0.04);
-    }
-  }
-
-  /* Top bar */
-  .topbar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:16px 20px 8px;
-  }
-  .tap-badge{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    font-size:12px;
-    font-weight:600;
-    color:var(--ink);
-    background:var(--paper-alt);
-    border:1px solid var(--line);
-    padding:6px 10px 6px 8px;
-    border-radius:99px;
-    animation:fadeSlideIn .5s ease both;
-  }
-  .tap-badge .dot{
-    width:7px;height:7px;border-radius:50%;
-    background:var(--lime-deep);
-    box-shadow:0 0 0 0 rgba(168,214,32,0.5);
-    animation:pulse 2s ease-out 1;
-  }
-  @keyframes pulse{
-    0%{box-shadow:0 0 0 0 rgba(168,214,32,0.45);}
-    70%{box-shadow:0 0 0 8px rgba(168,214,32,0);}
-    100%{box-shadow:0 0 0 0 rgba(168,214,32,0);}
-  }
-  .zynk-mark{
-    font-family:'Space Grotesk',sans-serif;
-    font-size:12px;
-    font-weight:600;
-    letter-spacing:0.08em;
-    color:var(--muted-2);
-  }
-
-  .lang-toggle{
-    display:inline-flex;
-    background:var(--paper-alt);
-    border:1px solid var(--line);
-    border-radius:99px;
-    padding:2px;
-    gap:2px;
-  }
-  .lang-toggle button{
-    border:none;
-    background:transparent;
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:0.02em;
-    color:var(--muted);
-    padding:5px 10px;
-    border-radius:99px;
-    cursor:pointer;
-    transition:background .2s ease, color .2s ease;
-  }
-  .lang-toggle button.active{
-    background:var(--ink);
-    color:var(--paper);
-  }
-
-  /* Hero */
-  .hero-wrap{
-    padding:8px 20px 0;
-  }
-  .hero{
-    position:relative;
-    height:190px;
-    border-radius:var(--radius-lg);
-    overflow:hidden;
-    background:
-      linear-gradient(180deg, rgba(17,19,16,0) 40%, rgba(17,19,16,0.65) 100%),
-      linear-gradient(135deg, #3A3F2E 0%, #1C1E17 100%);
-    animation:fadeSlideIn .55s ease .05s both;
-  }
-  .hero img{
-    position:absolute; inset:0;
-    width:100%; height:100%;
-    object-fit:cover;
-    opacity:0.85;
-    mix-blend-mode:normal;
-  }
-  .hero-status{
-    position:absolute;
-    top:12px; right:12px;
-    display:flex; align-items:center; gap:5px;
-    background:rgba(17,19,16,0.55);
-    backdrop-filter:blur(6px);
-    color:#fff;
-    font-size:11px;
-    font-weight:600;
-    padding:6px 10px;
-    border-radius:99px;
-  }
-  .hero-status .dot{width:6px;height:6px;border-radius:50%;background:var(--lime);}
-  .hero-bottom{
-    position:absolute;
-    left:16px; bottom:12px;
-    display:flex; align-items:center; gap:6px;
-    color:#fff;
-  }
-  .hero-rating{
-    display:inline-flex; align-items:center; gap:4px;
-    background:rgba(255,255,255,0.14);
-    backdrop-filter:blur(6px);
-    padding:5px 9px;
-    border-radius:99px;
-    font-size:12px;
-    font-weight:600;
-  }
-
-  /* Identity block */
-  .identity{
-    padding:0 20px;
-    margin-top:-30px;
-    position:relative;
-    z-index:2;
-    animation:fadeSlideIn .55s ease .1s both;
-  }
-  .avatar{
-    width:60px;height:60px;
-    border-radius:18px;
-    background:var(--ink);
-    color:var(--lime);
-    display:flex;align-items:center;justify-content:center;
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:700;
-    font-size:22px;
-    border:3px solid var(--paper);
-    box-shadow:var(--shadow-soft);
-  }
-  .identity-text{margin-top:12px;}
-  .biz-name{
-    font-size:23px;
-    font-weight:700;
-    margin:0 0 3px;
-    color:var(--ink);
-  }
-  .biz-meta{
-    font-size:13.5px;
-    color:var(--muted);
-    display:flex;
-    align-items:center;
-    gap:6px;
-    flex-wrap:wrap;
-  }
-  .biz-meta .sep{color:var(--muted-2);}
-
-  /* Primary CTA */
-  .primary-cta-wrap{padding:18px 20px 4px;}
-  .btn-primary{
-    width:100%;
-    background:var(--lime);
-    color:var(--ink);
-    border:none;
-    padding:16px 18px;
-    border-radius:var(--radius-md);
-    font-size:15.5px;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    cursor:pointer;
-    transition:transform .15s ease, background .2s ease;
-  }
-  .btn-primary:hover{background:var(--lime-deep);}
-  .btn-primary:active{transform:scale(0.98);}
-
-  /* Quick actions grid */
-  .quick-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-    padding:16px 20px 4px;
-  }
-  .quick-tile{
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:var(--radius-md);
-    padding:14px 8px 12px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:8px;
-    text-decoration:none;
-    color:var(--ink);
-    cursor:pointer;
-    transition:transform .15s ease, border-color .2s ease, box-shadow .2s ease;
-  }
-  .quick-tile:hover{border-color:var(--muted-2); box-shadow:var(--shadow-soft);}
-  .quick-tile:active{transform:scale(0.96);}
-  .tile-icon{
-    width:38px;height:38px;
-    border-radius:11px;
-    background:var(--paper-alt);
-    display:flex;align-items:center;justify-content:center;
-    color:var(--ink);
-  }
-  .tile-label{font-size:11.5px; font-weight:600; text-align:center; line-height:1.2;}
-
-  /* Section cards */
-  .section-card{
-    margin:16px 20px 0;
-    background:var(--paper-alt);
-    border:1px solid var(--line);
-    border-radius:var(--radius-lg);
-    padding:18px;
-  }
-  .review-card h3{font-size:16px; margin:0 0 4px;}
-  .review-card p{font-size:13px; color:var(--muted); margin:0 0 14px;}
-  .btn-outline{
-    display:inline-flex;
-    align-items:center;
-    gap:7px;
-    background:var(--paper);
-    border:1.5px solid var(--ink);
-    color:var(--ink);
-    padding:11px 16px;
-    border-radius:99px;
-    font-size:13.5px;
-    font-weight:700;
-    cursor:pointer;
-    transition:background .2s ease, color .2s ease;
-  }
-  .btn-outline:hover{background:var(--ink); color:var(--paper);}
-
-  /* Wifi card */
-  .wifi-card{display:none;}
-  .wifi-card.open{display:block; animation:fadeSlideIn .3s ease both;}
-  .wifi-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:var(--radius-sm);
-    padding:12px 14px;
-    margin-top:10px;
-  }
-  .wifi-row .k{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:2px;}
-  .wifi-row .v{font-size:14.5px; font-weight:600; font-family:'Space Grotesk',monospace;}
-  .copy-btn{
-    background:var(--ink);
-    color:var(--paper);
-    border:none;
-    width:34px;height:34px;
-    border-radius:10px;
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;
-    flex-shrink:0;
-  }
-  .copy-btn.copied{background:var(--lime-deep); color:var(--ink);}
-
-  /* Footer */
-  .footer{
-    padding:28px 20px 30px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:10px;
-  }
-  .footer .powered{
-    font-size:11.5px;
-    color:var(--muted-2);
-    display:flex;
-    align-items:center;
-    gap:5px;
-  }
-  .footer .powered b{
-    color:var(--muted);
-    font-family:'Space Grotesk',sans-serif;
-    letter-spacing:0.02em;
-  }
-  .share-btn{
-    background:none;
-    border:1px solid var(--line);
-    color:var(--muted);
-    font-size:12px;
-    font-weight:600;
-    padding:8px 14px;
-    border-radius:99px;
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    cursor:pointer;
-  }
-  .share-btn:hover{border-color:var(--muted-2); color:var(--ink);}
-
-  /* Bottom sheet (menu) */
-  .sheet-backdrop{
-    position:fixed; inset:0;
-    background:rgba(17,19,16,0.5);
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .25s ease;
-    z-index:100;
-  }
-  .sheet-backdrop.open{opacity:1; pointer-events:auto;}
-  .sheet{
-    position:fixed;
-    left:50%; right:auto; bottom:0;
-    width:min(100%,430px);
-    max-height:min(82vh,760px);
-    background:var(--paper);
-    border-radius:28px 28px 0 0;
-    transform:translate(-50%, calc(100% + 24px));
-    transition:transform .32s cubic-bezier(.32,.72,0,1);
-    z-index:101;
-    display:flex;
-    flex-direction:column;
-    box-shadow:0 -10px 40px rgba(0,0,0,0.2);
-    padding-bottom:env(safe-area-inset-bottom);
-  }
-  .sheet.open{transform:translate(-50%,0);}
-
-  @media (min-width:560px){
-    .sheet{bottom:40px; border-radius:28px; max-height:calc(100vh - 80px);}
-  }
-  .sheet-grabber{
-    width:36px;height:4px;
-    background:var(--line);
-    border-radius:99px;
-    margin:10px auto 4px;
-  }
-  .sheet-header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px 18px 4px;
-  }
-  .sheet-header h2{font-size:19px; margin:0;}
-  .sheet-close{
-    background:var(--paper-alt);
-    border:none;
-    width:32px;height:32px;
-    border-radius:10px;
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;
-    color:var(--ink);
-  }
-  .menu-tabs{
-    display:flex;
-    gap:6px;
-    padding:10px 18px 0;
-    overflow-x:auto;
-  }
-  .menu-tab{
-    border:1px solid var(--line);
-    background:var(--paper);
-    color:var(--muted);
-    font-size:12.5px;
-    font-weight:600;
-    padding:8px 14px;
-    border-radius:99px;
-    white-space:nowrap;
-    cursor:pointer;
-  }
-  .menu-tab.active{
-    background:var(--ink);
-    color:var(--paper);
-    border-color:var(--ink);
-  }
-  .menu-list{
-    padding:14px 18px 26px;
-    overflow-y:auto;
-  }
-  .menu-cat-title{
-    font-size:11px;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-    color:var(--muted-2);
-    margin:16px 0 8px;
-  }
-  .menu-cat-title:first-child{margin-top:0;}
-  .menu-item{
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    padding:12px 0;
-    border-bottom:1px solid var(--line);
-  }
-  .menu-item:last-child{border-bottom:none;}
-  .menu-item-name{font-size:14.5px; font-weight:700; margin:0 0 3px;}
-  .menu-item-desc{font-size:12.5px; color:var(--muted); margin:0; line-height:1.4;}
-  .menu-item-price{
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:600;
-    font-size:14px;
-    white-space:nowrap;
-    padding-top:2px;
-  }
-
-  /* Toast */
-  .toast{
-    position:fixed;
-    left:50%;
-    bottom:max(24px, env(safe-area-inset-bottom));
-    transform:translate(-50%,12px);
-    background:var(--ink);
-    color:var(--paper);
-    font-size:13px;
-    font-weight:600;
-    padding:11px 18px;
-    border-radius:99px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .25s ease, transform .25s ease;
-    z-index:200;
-    box-shadow:0 8px 24px rgba(0,0,0,0.25);
-  }
-  .toast.show{opacity:1; transform:translate(-50%,0);}
-
-  @keyframes fadeSlideIn{
-    from{opacity:0; transform:translateY(8px);}
-    to{opacity:1; transform:translateY(0);}
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
-  }
-
-  [data-i18n], [data-i18n-placeholder]{ }
-  .hidden{display:none !important;}
+:root{--lime:#C9FF31;--bg:#070707;--surf:#111311;--fg:#F4F6EF;--mut:#A4AAA0;--line:rgba(244,246,239,.11);--ease:cubic-bezier(.2,.8,.2,1);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+*,*:before,*:after{box-sizing:inherit;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+body{background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body.lock{overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+.i{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#top{position:fixed;left:0;top:0;height:2px;width:0;background:var(--lime);z-index:60}
+#glow{position:fixed;width:380px;height:380px;margin:-190px;border-radius:50%;background:radial-gradient(circle,rgba(201,255,49,.10),transparent 65%);pointer-events:none;z-index:0;opacity:0;transition:opacity .4s}
+#wipe{position:fixed;inset:0;background:var(--lime);z-index:55;transform:translateX(-101%);pointer-events:none}
+#wipe.go{animation:wipe .65s var(--ease)}
+@keyframes wipe{0%{transform:translateX(-101%)}45%{transform:none}100%{transform:translateX(101%)}}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 20px;background:rgba(7,7,7,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:.1em}.brand img{width:26px;height:26px}.brand small{color:var(--mut);font-size:.6rem;letter-spacing:.16em;font-weight:600}
+nav{display:none;position:relative;padding:4px;border:1px solid var(--line);border-radius:99px}
+nav button{position:relative;z-index:1;padding:8px 16px;border-radius:99px;color:var(--mut);font-size:.9rem;transition:color .25s}
+nav button.on{color:#070707}
+#ind{position:absolute;top:4px;bottom:4px;left:0;width:0;background:var(--lime);border-radius:99px;transition:.45s var(--ease)}
+.acts{display:flex;gap:8px;align-items:center}
+.ig{display:none;padding:9px 14px;border:1px solid var(--line);border-radius:99px;font-size:.88rem}
+.burger{padding:8px 11px;border:1px solid var(--line);border-radius:10px}
+#sheet{position:fixed;inset:0;z-index:30;background:rgba(7,7,7,.97);display:none;flex-direction:column;justify-content:center;gap:4px;padding:32px}
+#sheet.open{display:flex}#sheet button,#sheet a{font-size:2rem;font-weight:700;text-align:left;padding:8px 0}
+@media(min-width:960px){nav{display:flex}.burger{display:none}.ig{display:block}}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:99px;font-weight:700;transition:transform .2s,box-shadow .3s,background .2s;will-change:transform}
+.btn:active{transform:scale(.95)!important}
+.p{background:var(--lime);color:#070707}.p:hover{box-shadow:0 0 0 7px rgba(201,255,49,.16)}
+.g{border:1px solid var(--line)}.g:hover{background:rgba(244,246,239,.07)}
+main{position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:0 20px 60px}
+.view{display:none;padding-top:48px}.view.active{display:block}
+.rv{opacity:0;transform:translateY(18px);filter:blur(7px);transition:opacity .7s var(--ease),transform .7s var(--ease),filter .7s var(--ease)}.rv.in{opacity:1;transform:none;filter:none}
+.tag{color:var(--lime);font-size:.76rem;letter-spacing:.16em;font-weight:700;text-transform:uppercase}
+h1{font-size:clamp(2.5rem,8.4vw,5rem);line-height:1;letter-spacing:-.035em;margin:14px 0 18px}
+h2{font-size:clamp(1.8rem,5vw,3rem);line-height:1.08;letter-spacing:-.025em;margin:10px 0 14px}
+h3{letter-spacing:-.01em}
+em{font-style:normal;color:var(--lime)}
+.lead{color:var(--mut);max-width:580px;font-size:1.06rem}
+.row{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+/* hero */
+.hero{display:grid;gap:36px;align-items:center}@media(min-width:960px){.hero{grid-template-columns:1fr 1.05fr}}
+.steps{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.steps span{display:flex;align-items:center;gap:7px;padding:6px 13px;border:1px solid var(--line);border-radius:99px;color:var(--mut);font-size:.82rem;transition:.35s}
+.steps span:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.steps span.on{background:var(--lime);border-color:var(--lime);color:#070707;font-weight:700}
+.stage{position:relative;height:440px;border:1px solid var(--line);border-radius:34px;background:radial-gradient(circle at 70% 10%,#1b2410,var(--surf) 62%);overflow:hidden;perspective:1000px}
+.mark{position:absolute;right:-30px;top:-10px;width:330px;opacity:.07;animation:fl 6s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-14px) rotate(3deg)}}
+.note{position:absolute;padding:7px 13px;border-radius:99px;background:rgba(244,246,239,.08);backdrop-filter:blur(8px);border:1px solid var(--line);font-size:.74rem;animation:fl 5s ease-in-out infinite}
+.n1{left:18px;top:18px}.n2{right:18px;top:64px;animation-delay:-2s}.n3{left:24px;bottom:16px;animation-delay:-3s}
+.dev{position:absolute;left:8%;bottom:16%;width:38%;max-width:170px;aspect-ratio:.8;border-radius:24px 24px 34px 34px;background:linear-gradient(160deg,#1d201b,#0b0c0b);border:1px solid rgba(201,255,49,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;transition:box-shadow .5s,transform .6s var(--ease);font-size:.7rem;color:var(--mut)}
+.dev img{width:34%}.dev b{color:var(--fg);font-size:.8rem}
+.rings{position:relative;width:30px;height:30px}.rings i{position:absolute;inset:0;border:1.5px solid var(--lime);border-radius:50%;opacity:0;animation:ring 2.4s infinite}.rings i:nth-child(2){animation-delay:.8s}.rings i:nth-child(3){animation-delay:1.6s}
+@keyframes ring{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+.ph{position:absolute;right:7%;top:9%;width:46%;max-width:210px;aspect-ratio:.5;border-radius:32px;background:#050605;border:2px solid #2b2f2a;padding:8px;box-shadow:0 40px 80px rgba(0,0,0,.6);transform:rotateY(-10deg) rotateZ(3deg);transition:transform .7s var(--ease);animation:pf 6s ease-in-out infinite}
+@keyframes pf{50%{translate:0 -8px}}
+.ph:before{content:"";position:absolute;top:9px;left:50%;width:36%;height:9px;margin-left:-18%;background:#000;border-radius:9px;z-index:2}
+.sc{height:100%;border-radius:25px;background:var(--surf);overflow:hidden;display:flex;flex-direction:column}
+.sc .hd{padding:26px 12px 14px;background:linear-gradient(160deg,#25301a,#111311)}.hd small{font-size:.55rem;color:var(--mut);letter-spacing:.08em}.hd h4{font-size:.95rem}
+.sc .bd{padding:10px 12px;display:grid;gap:6px}
+.it{display:flex;justify-content:space-between;font-size:.66rem;padding:7px 0;border-bottom:1px solid var(--line);opacity:.2;transform:translateX(8px);transition:.5s var(--ease)}
+.pbtn{margin-top:4px;padding:8px;border-radius:12px;background:var(--lime);color:#070707;font-weight:800;font-size:.68rem;text-align:center;opacity:.3;transition:.5s}
+.stage.s1 .dev{box-shadow:0 0 60px rgba(201,255,49,.22)}
+.stage.s2 .ph{transform:rotateY(0) rotateZ(-2deg) translateX(-34px)}
+.stage.s3 .it,.stage.s3 .pbtn{opacity:1;transform:none}.stage.s3 .it:nth-child(2){transition-delay:.12s}.stage.s3 .it:nth-child(3){transition-delay:.24s}
+.stage.s3 .sc{box-shadow:inset 0 0 0 1px rgba(201,255,49,.5)}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--lime);color:#070707;padding:10px 18px;border-radius:99px;font-weight:700;font-size:.85rem;opacity:0;transition:.4s var(--ease);z-index:70;pointer-events:none}#toast.show{opacity:1;transform:translate(-50%,0)}
+.marq{margin:52px -20px 0;overflow:hidden;border-block:1px solid var(--line);padding:16px 0;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marq div{display:flex;gap:44px;width:max-content;animation:mq 28s linear infinite;color:var(--mut);font-size:.95rem}.marq span{display:flex;gap:9px;align-items:center;white-space:nowrap}.marq .i{color:var(--lime)}
+@keyframes mq{to{transform:translateX(-50%)}}
+/* cards */
+.grid{display:grid;gap:16px;margin-top:28px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.card{position:relative;overflow:hidden;background:var(--surf);border:1px solid var(--line);border-radius:26px;padding:24px;transition:transform .2s ease-out,border-color .3s;text-align:left;width:100%;display:block;transform-style:preserve-3d}
+.card:before{content:"";position:absolute;inset:0;background:radial-gradient(280px circle at var(--x,50%) var(--y,0),rgba(201,255,49,.14),transparent 62%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.07) 50%,transparent 60%);background-size:250% 100%;background-position:120% 0;transition:background-position .9s;pointer-events:none}
+.card:hover{border-color:rgba(201,255,49,.4)}.card:hover:before{opacity:1}.card:hover:after{background-position:-20% 0}
+.card>*{position:relative}.card h3{font-size:1.2rem;margin:12px 0 6px}.card p{color:var(--mut);font-size:.93rem}
+.ico{width:46px;height:46px;border-radius:14px;background:rgba(201,255,49,.1);color:var(--lime);display:grid;place-items:center}
+.num{color:var(--lime);font-weight:800;font-size:.8rem;letter-spacing:.1em}
+.pv{height:150px;margin:-8px -8px 10px;border-radius:18px;background:radial-gradient(circle at 50% 120%,rgba(201,255,49,.18),transparent 60%),#0b0d0b;display:grid;place-items:center;overflow:hidden}
+.pv .i{width:46px;height:46px;color:var(--lime);stroke-width:1.4;transition:transform .5s var(--ease)}.card:hover .pv .i{transform:scale(1.18) rotate(-6deg)}
+.pv img{position:absolute;width:120px;opacity:.06;right:-14px;bottom:-14px}
+.more{display:inline-flex;gap:6px;align-items:center;color:var(--lime);font-size:.85rem;font-weight:700;margin-top:12px}
+.row2{display:flex;align-items:center;gap:18px;padding:22px 24px;border-radius:24px}
+.row2 h3{margin:0 0 3px}.row2 .arr{margin-left:auto;width:42px;height:42px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;flex:none;transition:.3s}.row2:hover .arr{background:var(--lime);color:#070707;transform:rotate(45deg)}
+.list{display:grid;gap:12px;margin-top:22px}
+.tabs{display:inline-flex;padding:4px;border:1px solid var(--line);border-radius:99px;margin-top:22px}.tabs button{padding:9px 22px;border-radius:99px;color:var(--mut);font-weight:600;transition:.3s}.tabs button.on{background:var(--lime);color:#070707}
+.pane{display:none}.pane.on{display:block}
+.chk{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.chk .i{color:var(--lime)}
+.split{display:grid;gap:22px;margin-top:30px}@media(min-width:900px){.split{grid-template-columns:1.05fr .95fr}}
+.scard{aspect-ratio:1.6;max-width:380px;margin:auto;border-radius:24px;background:linear-gradient(140deg,#181b17,#070807);border:1px solid rgba(255,255,255,.16);padding:22px;position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6);transition:transform .2s}
+.scard:after{content:"";position:absolute;inset:-50%;background:linear-gradient(120deg,transparent 42%,rgba(201,255,49,.12),transparent 58%);animation:sh 5s linear infinite}@keyframes sh{to{transform:translateX(75%)}}
+.scard img{width:64px}.scard b{position:absolute;left:22px;bottom:40px;letter-spacing:.16em}.scard span{position:absolute;left:22px;bottom:20px;color:var(--mut);font-size:.75rem}
+.con{border:1px solid var(--line);border-radius:26px;background:var(--surf);padding:20px}.con .top{display:flex;justify-content:space-between;font-weight:700;margin-bottom:14px}.con .top em{font-size:.7rem;border:1px solid var(--lime);border-radius:99px;padding:2px 10px}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:10px}.cg>div{background:#0b0d0b;border-radius:16px;padding:14px}.cg small{color:var(--mut)}.cg b{display:block;font-size:2rem;color:var(--lime);line-height:1.1}
+.lv{grid-column:1/-1}.lv p{display:flex;justify-content:space-between;font-size:.85rem;padding:8px 0;border-bottom:1px solid var(--line)}.lv p:last-child{border:0}.lv p span{color:var(--mut)}
+.tl{margin-top:28px;display:grid;gap:14px}
+.team .card h3{font-size:1.05rem}
+.vis{margin-top:34px;padding:38px 26px;border-radius:30px;background:var(--lime);color:#070707}.vis h2{margin:6px 0 8px}.vis p{max-width:560px}.vis .tag{color:#070707}
+.cta{margin-top:54px;padding:38px 26px;border-radius:30px;border:1px solid var(--line);background:radial-gradient(circle at 90% 0,#1b2410,var(--surf) 60%);position:relative;overflow:hidden}.cta img{position:absolute;right:-20px;top:-20px;width:190px;opacity:.08}
+footer{position:relative;z-index:1;border-top:1px solid var(--line);padding:26px 20px;text-align:center;color:var(--mut);font-size:.85rem}
+/* modal */
+#modal{position:fixed;inset:0;z-index:50;display:none;place-items:center;padding:16px;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);overflow:auto}#modal.open{display:grid}
+.box{position:relative;max-width:820px;width:100%;background:var(--surf);border:1px solid var(--line);border-radius:30px;padding:26px;animation:pop .45s var(--ease);display:grid;gap:22px}
+@media(min-width:760px){.box.two{grid-template-columns:1fr 260px;align-items:center}}
+@keyframes pop{from{opacity:0;transform:translateY(20px) scale(.96)}}
+.x{position:absolute;right:14px;top:12px;width:36px;height:36px;border:1px solid var(--line);border-radius:50%;font-size:1.2rem;z-index:3}
+.acts4{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 12px}
+.acts4 button{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding:10px;border-radius:14px;background:#0b0d0b;border:1px solid var(--line);font-size:.68rem;text-align:left;transition:.25s}.acts4 button.on,.acts4 button:hover{border-color:var(--lime)}.acts4 .i{color:var(--lime)}
+.pd{margin:0 12px 12px;padding:10px;border-radius:14px;background:rgba(201,255,49,.08);font-size:.68rem;min-height:66px;animation:pop .4s var(--ease)}.pd b{display:block;color:var(--lime);margin-bottom:2px}
+.mph{width:230px;aspect-ratio:.52;margin:auto;border-radius:34px;background:#050605;border:2px solid #2b2f2a;padding:8px;position:relative;animation:pf 6s ease-in-out infinite}.mph:before{content:"";position:absolute;top:10px;left:50%;width:34%;height:10px;margin-left:-17%;background:#000;border-radius:9px;z-index:2}
+.box ul{margin:12px 0 0 18px;color:var(--mut)}
+.w{display:inline-block;opacity:0;filter:blur(10px);transform:translateY(.45em);animation:wIn .8s var(--ease) forwards}
+@keyframes wIn{to{opacity:1;filter:none;transform:none}}
+h2 em,em .w{background:linear-gradient(110deg,var(--lime) 40%,#fff 50%,var(--lime) 60%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shiny 3.5s linear infinite}
+em .w{animation:wIn .8s var(--ease) forwards,shiny 3.5s linear infinite}
+@keyframes shiny{from{background-position:120% 0}to{background-position:-20% 0}}
+.rotl{margin-top:16px;color:var(--mut)}.rot{display:inline-block;color:#070707;background:var(--lime);padding:2px 12px;border-radius:10px;font-weight:800}
+#dots{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.sp{position:fixed;width:2px;height:12px;border-radius:2px;background:var(--lime);pointer-events:none;z-index:80}
+nav button{transition:transform .2s,color .25s}
+@media(prefers-reduced-motion:reduce){.w{opacity:1;filter:none;transform:none}*,*:before,*:after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none;filter:none}}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></symbol>
+<symbol id="wifi" viewBox="0 0 24 24"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 19.5h.01"/></symbol>
+<symbol id="star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
+<symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+<symbol id="chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"/></symbol>
+<symbol id="tag" viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9z"/><path d="M7.5 7.5h.01"/></symbol>
+<symbol id="video" viewBox="0 0 24 24"><path d="M3 6h12v12H3zM15 10l6-3v10l-6-3"/></symbol>
+<symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+<symbol id="car" viewBox="0 0 24 24"><path d="M3 15l2-6h14l2 6v4h-3v-2H6v2H3zM7 13h.01M17 13h.01"/></symbol>
+<symbol id="dumb" viewBox="0 0 24 24"><path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"/></symbol>
+<symbol id="cut" viewBox="0 0 24 24"><circle cx="6" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><path d="M8 9l12 9M8 15L20 6"/></symbol>
+<symbol id="bed" viewBox="0 0 24 24"><path d="M3 18V7M3 14h18v4M21 14v-3a3 3 0 0 0-3-3h-7v6"/></symbol>
+<symbol id="moon" viewBox="0 0 24 24"><path d="M20 14A8 8 0 1 1 10 4a6 6 0 0 0 10 10z"/></symbol>
+<symbol id="table" viewBox="0 0 24 24"><path d="M4 8h16M6 8v11M18 8v11M9 8v4h6V8"/></symbol>
+<symbol id="disp" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 9a4 4 0 0 1 6 0M10.5 11.5a1.5 1.5 0 0 1 3 0"/></symbol>
+<symbol id="card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 14h5M7 10h2"/></symbol>
+<symbol id="arr" viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></symbol>
+<symbol id="ok" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+<symbol id="key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/></symbol>
+</defs></svg>
+<canvas id="dots"></canvas><div id="top"></div><div id="wipe"></div><div id="glow"></div>
+<header>
+  <button class="brand" data-go="inicio" aria-label="ZYNK inicio"><img data-logo alt="">ZYNK<small>CUSCO · PERÚ</small></button>
+  <nav id="nav"><span id="ind"></span>
+    <button data-go="inicio">Inicio</button><button data-go="productos">Productos</button><button data-go="soluciones">Soluciones</button><button data-go="historia">Historia</button><button data-go="clientes">Clientes</button></nav>
+  <div class="acts"><a class="ig" href="https://www.instagram.com/zynk_pe/" target="_blank" rel="noopener">Instagram ↗</a><button class="btn p mag" data-contact style="padding:9px 16px">Hablar con ZYNK</button><button class="burger" id="bg" aria-label="Menú"><svg class="i"><use href="#menu"/></svg></button></div>
+</header>
+<div id="sheet"><button data-go="inicio">Inicio</button><button data-go="productos">Productos</button><button data-go="soluciones">Soluciones</button><button data-go="historia">Historia</button><button data-go="clientes">Clientes</button><a href="https://www.instagram.com/zynk_pe/" target="_blank" rel="noopener">Instagram ↗</a><button id="sc" style="font-size:1rem;color:var(--mut)">Cerrar</button></div>
 
-<div class="stage">
-  <main class="app" id="app">
+<main>
+<section class="view" id="v-inicio">
+ <div class="hero">
+  <div>
+   <div class="tag rv">Nacido en Cusco · 2026</div>
+   <h1 class="rv">Un toque.<br><em>Todo conectado.</em></h1>
+   <p class="lead rv">ZYNK acerca la tecnología a los negocios físicos para reducir tiempos y conectar a las personas con lo que necesitan, al instante.</p>
+   <div class="rotl rv">Conectando a <span class="rot" id="rot">restaurantes</span></div>
+   <div class="row rv"><button class="btn p mag" data-go="historia">Conocer ZYNK <svg class="i"><use href="#arr"/></svg></button><button class="btn g mag" id="demo">Ver cómo funciona ▶</button></div>
+   <div class="steps rv" id="steps"><span class="on">Acerca</span><span>Toca</span><span>Abre</span><span>Conecta</span></div>
+  </div>
+  <div class="stage rv" id="stage">
+   <img class="mark" data-logo alt="">
+   <div class="note n1">Conexión inmediata</div><div class="note n2">Menos tiempo. Más cercanía.</div><div class="note n3">Físico → Digital</div>
+   <div class="dev"><div class="rings"><i></i><i></i><i></i></div><img data-logo alt=""><b>Acerca tu celular</b><span>Se abre al instante</span></div>
+   <div class="ph"><div class="sc"><div class="hd"><small>Contemporary Peruvian Cuisine</small><h4>NUNA Restaurant</h4></div><div class="bd"><div class="it"><span>Carta</span><span>→</span></div><div class="it"><span>Wi‑Fi</span><span>→</span></div><div class="it"><span>Ubicación</span><span>→</span></div><button class="pbtn" id="rev">★ Dejar reseña</button></div></div></div>
+  </div>
+ </div>
+ <div class="marq"><div id="mq"></div></div>
+ <div class="tag rv" style="margin-top:56px">Explora ZYNK</div><h2 class="rv">Cada tema, en su propio espacio.</h2>
+ <div class="grid" id="gw"></div>
+</section>
 
-    <!-- Top bar -->
-    <div class="topbar">
-      <div class="tap-badge"><span class="dot"></span><span data-i18n="guestAccess">Guest access</span></div>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <span class="zynk-mark">ZYNK</span>
-        <div class="lang-toggle" role="group" aria-label="Language selector">
-          <button type="button" id="lang-en" class="active" aria-pressed="true">EN</button>
-          <button type="button" id="lang-es" aria-pressed="false">ES</button>
-        </div>
-      </div>
-    </div>
+<section class="view" id="v-productos">
+ <div class="tag rv">Ecosistema ZYNK</div><h1 class="rv" style="font-size:clamp(2.2rem,7vw,4rem)">Un producto físico.<br><em>Múltiples posibilidades.</em></h1>
+ <p class="lead rv">Toca un producto para verlo funcionando en un celular.</p><div class="grid" id="pg"></div>
+</section>
 
-    <!-- Hero -->
-    <div class="hero-wrap">
-      <div class="hero">
-        <img id="hero-image" src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=60" alt="NUNA Restaurant" fetchpriority="high" />
-        <div class="hero-status"><span class="dot"></span><span id="biz-status">Open now</span></div>
-        <div class="hero-bottom">
-          <div class="hero-rating">★&nbsp;<span id="biz-rating">4.8</span> <span id="biz-review-count" style="opacity:.7; font-weight:500;">· 210</span></div>
-        </div>
-      </div>
-    </div>
+<section class="view" id="v-soluciones">
+ <div class="tag rv">Soluciones</div><h1 class="rv" style="font-size:clamp(2.2rem,7vw,4rem)">La tecnología tiene que <em>resolver algo.</em></h1>
+ <p class="lead rv">ZYNK no busca poner NFC en cualquier lugar. Empieza por un problema real y lo resuelve en un toque.</p><div class="list" id="sl"></div>
+ <div class="grid" id="pr"></div>
+</section>
 
-    <!-- Identity -->
-    <div class="identity">
-      <div class="avatar" id="biz-avatar" aria-hidden="true">N</div>
-      <div class="identity-text">
-        <h1 class="biz-name" id="biz-name">NUNA Restaurant</h1>
-        <div class="biz-meta">
-          <span id="biz-category">Contemporary Peruvian Cuisine</span>
-          <span class="sep">·</span>
-          <span id="biz-location">San Blas, Cusco</span>
-        </div>
-      </div>
-    </div>
+<section class="view" id="v-historia">
+ <div class="tag rv">Nuestra historia</div><h1 class="rv" style="font-size:clamp(2.1rem,6.5vw,3.8rem);max-width:820px">ZYNK nace de mirar lo cotidiano y preguntarnos: <em>¿por qué todavía tarda tanto?</em></h1>
+ <div class="grid">
+  <div class="card rv"><span class="num">EL PROBLEMA</span><h3>Información que existe, pero no llega rápido.</h3><p>Cartas físicas, respuestas lentas, poca presencia web, pocas reseñas e información dispersa.</p></div>
+  <div class="card rv"><span class="num">LA IDEA</span><h3>Que el celular sea el acceso.</h3><p>Digitalizar negocios locales y acercar información y acciones al consumidor desde un punto físico.</p></div>
+  <div class="card rv"><span class="num">LA AMBICIÓN</span><h3>Empezar en Cusco. Conectar el Perú.</h3><p>Demostrar que desde Cusco se puede construir tecnología útil y competitiva.</p></div>
+ </div>
+ <div class="grid">
+  <div class="card rv"><div class="ico"><svg class="i"><use href="#link"/></svg></div><h3>Sincronización</h3><p>ZYNK viene de <em>synchronization</em>: conectar al instante a una persona, su celular y la información o acción de un negocio, espacio, producto u otra persona.</p></div>
+  <div class="card rv"><div class="ico"><img data-logo alt="" style="width:22px"></div><h3>El rayo</h3><p>Representa conexión y velocidad: menos espera, menos búsqueda manual, acceso directo a lo que importa.</p></div>
+ </div>
+ <h2 class="rv" style="margin-top:46px;font-size:1.7rem">Equipo fundador</h2>
+ <div class="grid team">
+  <div class="card rv"><span class="num">FUNDADOR</span><h3>Mauricio Santiago Niño de Guzmán Rodríguez</h3></div>
+  <div class="card rv"><span class="num">COFUNDADOR</span><h3>Sebastian Leonardo Tello Báez</h3></div>
+  <div class="card rv"><span class="num">COFUNDADOR</span><h3>Matias Grajeda Loayza</h3></div>
+ </div>
+ <div class="vis rv"><span class="tag">Visión</span><h2>De Cusco hacia todo el Perú.</h2><p>Que más negocios descubran que la tecnología no tiene por qué complicar la operación: puede hacerla más rápida y acercar al cliente.</p></div>
+</section>
 
-    <!-- Primary CTA -->
-    <div class="primary-cta-wrap">
-      <button type="button" class="btn-primary" id="open-menu-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v18M4 3c0 4 2 5 2 5s2-1 2-5M4 8h4M15 3c-1.5 0-3 1-3 4s1.5 4 3 4 3-1 3-4-1.5-4-3-4Zm0 8v10"/></svg>
-        <span data-i18n="viewMenu">View Menu</span>
-      </button>
-    </div>
-
-    <!-- Quick actions -->
-    <div class="quick-grid">
-      <a class="quick-tile" id="maps-link" href="https://www.google.com/maps/search/?api=1&query=restaurants+San+Blas+Cusco" target="_blank" rel="noopener">
-        <span class="tile-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
-        <span class="tile-label" data-i18n="maps">Maps</span>
-      </a>
-      <a class="quick-tile" id="whatsapp-link" href="https://wa.me/?text=Hola%2C%20vengo%20desde%20la%20pagina%20de%20NUNA%20Restaurant" target="_blank" rel="noopener">
-        <span class="tile-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z"/></svg></span>
-        <span class="tile-label">WhatsApp</span>
-      </a>
-      <a class="quick-tile" id="instagram-link" href="https://www.instagram.com/" target="_blank" rel="noopener">
-        <span class="tile-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="3.6"/><circle cx="17.2" cy="6.8" r="1"/></svg></span>
-        <span class="tile-label">Instagram</span>
-      </a>
-      <button type="button" class="quick-tile" id="wifi-toggle-btn" aria-expanded="false" aria-controls="wifi-card">
-        <span class="tile-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8.5a16 16 0 0 1 20 0M5 12a11 11 0 0 1 14 0M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/></svg></span>
-        <span class="tile-label">Wi-Fi</span>
-      </button>
-      <a class="quick-tile" id="reservations-link" href="https://wa.me/?text=Hola%2C%20quisiera%20hacer%20una%20reserva%20en%20NUNA%20Restaurant" target="_blank" rel="noopener">
-        <span class="tile-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M16 3v3M8 3v3M3 9.5h18"/></svg></span>
-        <span class="tile-label" data-i18n="reservations">Reservations</span>
-      </a>
-      <a class="quick-tile" id="reviews-link" href="https://www.google.com/maps/search/?api=1&query=restaurants+San+Blas+Cusco" target="_blank" rel="noopener">
-        <span class="tile-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 17l-5.6 3.1 1.4-6.3-4.8-4.3 6.4-.6L12 3Z"/></svg></span>
-        <span class="tile-label" data-i18n="reviews">Reviews</span>
-      </a>
-    </div>
-
-    <!-- Wifi card (revealed on tap) -->
-    <div class="section-card wifi-card" id="wifi-card">
-      <h3 style="font-size:16px; margin:0 0 2px;">Wi-Fi</h3>
-      <p style="font-size:13px; color:var(--muted); margin:0;" data-i18n="wifiSub">Free for guests</p>
-      <div class="wifi-row">
-        <div>
-          <div class="k" data-i18n="network">Network</div>
-          <div class="v" id="wifi-network">NUNA_GUEST</div>
-        </div>
-      </div>
-      <div class="wifi-row">
-        <div>
-          <div class="k" data-i18n="password">Password</div>
-          <div class="v" id="wifi-password">nuna-cusco26</div>
-        </div>
-        <button type="button" class="copy-btn" id="wifi-copy-btn" aria-label="Copy password">
-          <svg id="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Review CTA -->
-    <div class="section-card review-card">
-      <h3 data-i18n="reviewHeading">Enjoying your experience?</h3>
-      <p id="review-sub">Your feedback helps NUNA grow.</p>
-      <a class="btn-outline" id="review-cta-link" href="https://www.google.com/maps/search/?api=1&query=restaurants+San+Blas+Cusco" target="_blank" rel="noopener">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 17l-5.6 3.1 1.4-6.3-4.8-4.3 6.4-.6L12 3Z"/></svg>
-        <span data-i18n="leaveReview">Leave a review</span>
-      </a>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
-      <button type="button" class="share-btn" id="share-btn">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
-        <span data-i18n="share">Share</span>
-      </button>
-      <div class="powered">
-        <span data-i18n="poweredBy">Powered by</span> <b>ZYNK</b>
-      </div>
-    </div>
-
-    <!-- Menu bottom sheet -->
-    <div class="sheet-backdrop" id="sheet-backdrop"></div>
-    <div class="sheet" id="menu-sheet" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="menu-title" inert>
-      <div class="sheet-grabber"></div>
-      <div class="sheet-header">
-        <h2 id="menu-title" data-i18n="menuTitle">Menu</h2>
-        <button type="button" class="sheet-close" id="sheet-close-btn" aria-label="Close menu">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <div class="menu-tabs" id="menu-tabs"></div>
-      <div class="menu-list" id="menu-list"></div>
-    </div>
-
-    <!-- Toast -->
-    <div class="toast" id="toast">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-      <span id="toast-text"></span>
-    </div>
-
-  </main>
-</div>
+<section class="view" id="v-clientes">
+ <div class="tag rv">Para clientes</div><h1 class="rv" style="font-size:clamp(2.2rem,7vw,4rem)">Tecnología con <em>valor visible.</em></h1>
+ <div class="tabs rv" id="tabs"><button class="on" data-t="b">Empresas</button><button data-t="p">Personas</button></div>
+ <div class="split">
+  <div>
+   <div class="pane on" id="t-b"><p class="lead rv">Para un negocio, ZYNK concentra información, reduce preguntas repetitivas y crea nuevos puntos de contacto.</p>
+    <div class="rv"><div class="chk"><svg class="i"><use href="#ok"/></svg>Información disponible en el momento exacto</div><div class="chk"><svg class="i"><use href="#ok"/></svg>Contenido actualizable sin cambiar el objeto físico</div><div class="chk"><svg class="i"><use href="#ok"/></svg>Reseñas, redes, contacto, Wi‑Fi y acciones clave</div><div class="chk"><svg class="i"><use href="#ok"/></svg>Una experiencia adaptable a cada sector</div></div></div>
+   <div class="pane" id="t-p"><p class="lead rv">Para una persona, ZYNK es una identidad digital física: una sola tarjeta con los enlaces que decides mostrar.</p>
+    <div class="rv"><div class="chk"><svg class="i"><use href="#ok"/></svg>Instagram y más redes, sin escribir usuarios</div><div class="chk"><svg class="i"><use href="#ok"/></svg>Información siempre actualizable</div><div class="chk"><svg class="i"><use href="#ok"/></svg>Menos tiempo escribiendo datos manualmente</div><div class="chk"><svg class="i"><use href="#ok"/></svg>Diseñada para networking y vida social</div></div></div>
+  </div>
+  <div class="rv"><div class="scard" id="sccard"><img data-logo alt=""><b>ZYNK SOCIAL CARD</b><span>tap → connect</span></div></div>
+ </div>
+ <div class="con rv" style="margin-top:34px"><div class="top">ZYNK Console <em>Concepto</em></div><div class="cg"><div><small>Experiencias activas</small><b class="cnt" data-n="24">0</b></div><div><small>Dispositivos</small><b class="cnt" data-n="38">0</b></div><div class="lv"><small>Actividad reciente</small><p>Restaurante · Mesa 12<span>Ahora</span></p><p>Barbería · Estación 04<span>2 min</span></p><p>Stay · Habitación 302<span>8 min</span></p></div></div></div>
+</section>
+<div class="cta rv" id="cta" style="display:none"><img data-logo alt=""><h2 style="margin-top:0">¿Conectamos tu negocio?</h2><p class="lead">Cuéntanos qué necesitas y armamos tu experiencia ZYNK.</p><div class="row"><button class="btn p mag" data-contact>Hablar con ZYNK</button></div></div>
+</main>
+<footer><b style="color:var(--fg)">ZYNK</b> · Cusco, Perú · 2026 · <a href="https://www.instagram.com/zynk_pe/" target="_blank" rel="noopener" style="color:var(--lime)">@zynk_pe</a></footer>
+<div id="modal"><div class="box" id="box"></div></div><div id="toast"></div>
 
 <script>
-/* ============================================================
-   ZYNK — business configuration
-   This object is the single source of truth for the page.
-   To onboard a new business, duplicate this object with a new
-   id and swap it in at ACTIVE_BUSINESS — no markup changes needed.
-   ============================================================ */
-const BUSINESSES = {
-  nuna: {
-    id: "nuna",
-    name: "NUNA Restaurant",
-    category: { en: "Contemporary Peruvian Cuisine", es: "Cocina Peruana Contemporánea" },
-    location: "San Blas, Cusco",
-    coordinates: { lat: -13.5164, lng: -71.9764 },
-    rating: 4.8,
-    reviewCount: 210,
-    status: "open",
-    avatarInitial: "N",
-    heroImage: "https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=900&q=60",
-    theme: { accent: "#CFFF3E" },
-    // DEMO: todos estos destinos son funcionales. Sustituir por los enlaces reales del cliente al onboardearlo.
-    links: {
-      googleMaps: "https://www.google.com/maps/search/?api=1&query=restaurants+San+Blas+Cusco",
-      whatsapp: "https://wa.me/?text=Hola%2C%20vengo%20desde%20la%20pagina%20de%20NUNA%20Restaurant",
-      whatsappReservations: "https://wa.me/?text=Hola%2C%20quisiera%20hacer%20una%20reserva%20en%20NUNA%20Restaurant",
-      instagram: "https://www.instagram.com/",
-      reviewsUrl: "https://www.google.com/maps/search/?api=1&query=restaurants+San+Blas+Cusco",
-      website: "https://www.google.com/search?q=restaurants+San+Blas+Cusco"
-    },
-    wifi: { network: "NUNA_GUEST", password: "nuna-cusco26" },
-    menu: {
-      currency: "S/",
-      categories: [
-        {
-          key: "starters",
-          items: [
-            { name: { en: "Causa Limeña Trio", es: "Trío de Causa Limeña" }, desc: { en: "Three takes on classic potato causa, ají amarillo, avocado", es: "Tres versiones de causa clásica, ají amarillo, palta" }, price: 32 },
-            { name: { en: "Tuna Tiradito", es: "Tiradito de Atún" }, desc: { en: "Yellowfin tuna, rocoto leche de tigre, sweet potato", es: "Atún aleta amarilla, leche de tigre de rocoto, camote" }, price: 38 },
-            { name: { en: "Beef Heart Anticuchos", es: "Anticuchos de Corazón" }, desc: { en: "Grilled skewers, huacatay chimichurri", es: "Brochetas a la parrilla, chimichurri de huacatay" }, price: 28 }
-          ]
-        },
-        {
-          key: "mains",
-          items: [
-            { name: { en: "Lomo Saltado Nuna", es: "Lomo Saltado Nuna" }, desc: { en: "Wagyu strips, purple potato, aged soy, herb rice", es: "Tiras de wagyu, papa morada, soya añejada, arroz de hierbas" }, price: 68 },
-            { name: { en: "Ají de Gallina, Reimagined", es: "Ají de Gallina Reimaginado" }, desc: { en: "Slow-cooked chicken, walnut ají cream, quail egg", es: "Pollo cocido lento, crema de ají y nuez, huevo de codorniz" }, price: 52 },
-            { name: { en: "Andean Duck Rice", es: "Arroz con Pato Andino" }, desc: { en: "Duck confit, cilantro rice, chicha de jora reduction", es: "Confit de pato, arroz con culantro, reducción de chicha de jora" }, price: 58 }
-          ]
-        },
-        {
-          key: "drinks",
-          items: [
-            { name: { en: "Pisco Sour Nuna", es: "Pisco Sour Nuna" }, desc: { en: "Quebranta pisco, lime, egg white, bitters", es: "Pisco quebranta, limón, clara de huevo, bitters" }, price: 30 },
-            { name: { en: "Artisanal Chicha Morada", es: "Chicha Morada Artesanal" }, desc: { en: "Purple corn, pineapple, clove, cinnamon", es: "Maíz morado, piña, clavo, canela" }, price: 16 },
-            { name: { en: "Passionfruit Spritz", es: "Maracuyá Spritz" }, desc: { en: "Passion fruit, prosecco, soda", es: "Maracuyá, prosecco, soda" }, price: 26 }
-          ]
-        }
-      ]
-    }
-  }
-};
-const requestedBusiness = new URLSearchParams(window.location.search).get("business");
-const ACTIVE_BUSINESS = BUSINESSES[requestedBusiness] ? requestedBusiness : "nuna";
-const biz = BUSINESSES[ACTIVE_BUSINESS];
+const LOGO="data:image/png;base64,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";
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const ic=n=>`<svg class="i"><use href="#${n}"/></svg>`;
+$$("[data-logo]").forEach(i=>i.src=LOGO);
+const RM=matchMedia("(prefers-reduced-motion:reduce)").matches;
+const P=[
+["Business Display","disp","Flagship · B2B","Acceso premium para negocios físicos: abre toda la experiencia digital del establecimiento.","NUNA Restaurant",[["menu","Carta","Platos y precios siempre actualizados."],["wifi","Wi‑Fi","Conectado sin pedir la clave."],["pin","Ubicación","Cómo llegar en un toque."],["star","Reseñas","Deja tu opinión en segundos."]]],
+["ZYNK Table","table","Hospitality · B2B","Cada mesa es un acceso directo: identifica la mesa y muestra menú, promociones y servicios.","Mesa 05",[["menu","Menú","Pide desde tu mesa."],["tag","Promos","Ofertas del día."],["wifi","Wi‑Fi","Red del local."],["star","Reseñas","Cuéntanos tu experiencia."]]],
+["Social Card","card","B2C · Personas","Comparte tu identidad digital y enlaces sin escribir usuarios ni teléfonos.","Tu perfil",[["link","Instagram","Perfil abierto al instante."],["user","Contacto","Guardar contacto."],["video","Portafolio","Tu trabajo, a la vista."],["link","Enlaces","Los que tú decidas."]]],
+["ZYNK Stay","bed","Stay · Hospedaje","Para Airbnb, hostales y alojamientos: todo lo que el huésped necesita, sin preguntar.","Habitación 302",[["wifi","Wi‑Fi","Clave y red."],["key","Reglas","Normas de la casa."],["cal","Check‑out","Hora y pasos."],["pin","Cerca","Lugares recomendados."]]],
+["ZYNK Gym","dumb","Fitness · B2B","Puntos NFC en las máquinas: uso básico, músculos trabajados y videos justo donde surge la duda.","Prensa de pierna",[["dumb","Uso","Cómo ajustar y usar."],["user","Músculos","Qué trabajas."],["video","Video","Técnica paso a paso."],["pin","Gimnasio","Horarios e info."]]],
+["ZYNK Beauty","cut","Beauty · B2B","Barberías y salones: servicios, precios, trabajos, profesionales y reservas.","Estación 04",[["tag","Precios","Lista de servicios."],["video","Trabajos","Galería del profesional."],["cal","Reservas","Elige tu horario."],["link","Instagram","Síguenos."]]],
+["ZYNK Night","moon","Nightlife · B2B","Bares y discotecas: carta, promociones, eventos, mesa identificada y mapa interno.","Mesa VIP 3",[["menu","Carta","Tragos y combos."],["tag","Promos","Hoy en la noche."],["cal","Eventos","Próximas fechas."],["pin","Mapa","Ubícate en el local."]]],
+["ZYNK Auto","car","Automotive · B2B","Concesionarias: ficha del vehículo, equipamiento, precio, financiamiento y asesor.","Ficha del vehículo",[["car","Ficha","Especificaciones."],["tag","Precio","Precio y ofertas."],["video","Fotos","Galería del auto."],["chat","Asesor","Contacto directo."]]]];
+const SOL=[["Restaurantes y cafés","Menú, Wi‑Fi, reseñas, ubicación y promociones sin que el cliente tenga que preguntar.",0],["Hospedaje","Llegada, reglas, Wi‑Fi, check‑out y recomendaciones en un solo punto.",3],["Gimnasios","Explicación de cada máquina justo donde surge la duda.",4],["Belleza","Precios, estilos, profesionales y reservas desde cada estación.",5],["Bares y clubs","Carta, eventos y orientación dentro del local desde la mesa.",6],["Automotriz","Detalles del vehículo, precio y contacto con el asesor desde el auto.",7]];
+const PR=[["Reducir tiempos","Menos espera para encontrar información o pedir ayuda."],["Acercar negocio y consumidor","El negocio comunica mejor; el cliente encuentra lo que necesita."],["Tecnología con propósito","Si no reduce fricción, no la forzamos."],["Escalar desde una base","Pocos formatos físicos, experiencias distintas por sector."]];
+const GW=[["productos","01 · Productos","La familia ZYNK.","Business Display, Table, Social Card, Stay, Gym, Beauty, Night y Auto.","disp"],["soluciones","02 · Soluciones","Problemas reales.","La misma lógica aplicada a contextos distintos.","tag"],["historia","03 · Historia","Nacido en Cusco.","Origen, significado, fundadores y visión.","pin"],["clientes","04 · Clientes","Valor para ti.","Qué cambia para una empresa y para una persona.","user"]];
+$("#mq").innerHTML=[0,1].map(()=>P.map(p=>`<span>${ic(p[1])}${p[0]}</span>`).join("")).join("");
+$("#gw").innerHTML=GW.map(g=>`<button class="card rv" data-go="${g[0]}"><div class="ico">${ic(g[4])}</div><span class="num" style="display:block;margin-top:12px">${g[1]}</span><h3 style="margin-top:4px">${g[2]}</h3><p>${g[3]}</p><span class="more">Entrar ${ic("arr")}</span></button>`).join("");
+$("#pg").innerHTML=P.map((p,i)=>`<button class="card rv" data-p="${i}"><div class="pv"><img data-logo src="${LOGO}" alt="">${ic(p[1])}</div><span class="num">${p[2]}</span><h3>${p[0]}</h3><p>${p[3]}</p><span class="more">Ver en celular ${ic("arr")}</span></button>`).join("");
+$("#sl").innerHTML=SOL.map((s,i)=>`<button class="card row2 rv" data-p="${s[2]}"><span class="num">0${i+1}</span><div><h3>${s[0]}</h3><p>${s[1]}</p></div><span class="arr">${ic("arr")}</span></button>`).join("");
+$("#pr").innerHTML=PR.map((s,i)=>`<div class="card rv"><span class="num">0${i+1}</span><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join("");
+/* modal */
+const modal=$("#modal"),box=$("#box");
+function open(html,cls=""){box.className="box "+cls;box.innerHTML='<button class="x" aria-label="Cerrar" data-close>×</button>'+html;modal.classList.add("open");document.body.classList.add("lock")}
+function close(){modal.classList.remove("open");document.body.classList.remove("lock")}
+function product(i){const p=P[i];open(`<div><span class="tag">${p[2]}</span><h2>${p[0]}</h2><p class="lead">${p[3]}</p><ul>${p[5].map(a=>`<li>${a[1]}: ${a[2]}</li>`).join("")}</ul><div class="row"><button class="btn p" data-contact>Quiero este producto</button></div></div>
+<div class="mph"><div class="sc"><div class="hd"><small>ZYNK · ${p[2]}</small><h4>${p[4]}</h4></div><div class="acts4">${p[5].map((a,k)=>`<button data-a="${k}" data-pi="${i}">${ic(a[0])}<b>${a[1]}</b></button>`).join("")}</div><div class="pd" id="pd"><b>Toca una opción</b>Así vería tu cliente la experiencia.</div></div></div>`,"two")}
+function contact(){open(`<div><span class="tag">Contacto</span><h2>Hablar con ZYNK</h2><p class="lead">Por ahora atendemos por Instagram. Escríbenos y te respondemos.</p><div class="row"><a class="btn p" href="https://www.instagram.com/zynk_pe/" target="_blank" rel="noopener">Ir a @zynk_pe ${ic("arr")}</a></div></div>`)}
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),2100)}
+document.addEventListener("click",e=>{
+ if(e.target.closest("[data-close]")||e.target===modal){close();return}
+ const a=e.target.closest("[data-a]");if(a){$$("[data-a]").forEach(b=>b.classList.toggle("on",b===a));const d=P[a.dataset.pi][5][a.dataset.a];$("#pd").outerHTML=`<div class="pd" id="pd"><b>${d[1]}</b>${d[2]}</div>`;return}
+ const p=e.target.closest("[data-p]");if(p){product(+p.dataset.p);return}
+ if(e.target.closest("[data-contact]")){contact();return}
+ const g=e.target.closest("[data-go]");if(g)go(g.dataset.go)});
+addEventListener("keydown",e=>{if(e.key==="Escape"){close();$("#sheet").classList.remove("open")}});
+$("#bg").onclick=()=>$("#sheet").classList.add("open");$("#sc").onclick=()=>$("#sheet").classList.remove("open");
+$("#rev").onclick=()=>toast("Demo: aquí se abriría la reseña del negocio");
+/* routing */
+const V=["inicio","productos","soluciones","historia","clientes"];
+function ind(){const b=$("#nav button.on"),n=$("#nav");if(!b||!n.offsetWidth)return;$("#ind").style.left=b.offsetLeft+"px";$("#ind").style.width=b.offsetWidth+"px"}
+function reveal(root){$$('h1[data-o]',root).forEach(splitH);$$(".rv",root).forEach((el,i)=>{el.classList.remove("in");setTimeout(()=>el.classList.add("in"),80+Math.min(i*60,420))})}
+function count(){$$(".cnt").forEach(c=>{const n=+c.dataset.n;let t=0;const s=setInterval(()=>{t+=Math.ceil(n/20);if(t>=n){t=n;clearInterval(s)}c.textContent=t},45)})}
+function go(n,push=true){if(!V.includes(n))n="inicio";$("#sheet").classList.remove("open");
+ const w=$("#wipe");if(!RM&&push){w.classList.remove("go");void w.offsetWidth;w.classList.add("go")}
+ setTimeout(()=>{$$(".view").forEach(v=>v.classList.toggle("active",v.id==="v-"+n));$$("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.go===n));ind();
+  const c=$("#cta");c.style.display=n==="inicio"?"none":"block";scrollTo({top:0});reveal($("#v-"+n));if(n!=="inicio")reveal(c);if(n==="clientes")count();
+  if(push)history.pushState(null,"","#"+n)},RM||!push?0:260)}
+addEventListener("popstate",()=>go((location.hash||"#inicio").slice(1),false));addEventListener("resize",ind);
+$$("#tabs button").forEach(b=>b.onclick=()=>{$$("#tabs button").forEach(x=>x.classList.toggle("on",x===b));$$(".pane").forEach(x=>x.classList.remove("on"));const t=$("#t-"+b.dataset.t);t.classList.add("on");reveal(t)});
+/* demo NFC */
+const st=$("#stage"),sp=$$("#steps span");let T=[],auto,k=0;
+const setStep=i=>{sp.forEach((s,j)=>s.classList.toggle("on",j===i))};
+function loop(){if(RM)return;clearInterval(auto);auto=setInterval(()=>{k=(k+1)%4;setStep(k)},1800)}
+$("#demo").onclick=()=>{T.forEach(clearTimeout);clearInterval(auto);st.className="stage rv in";setStep(0);
+ [["s1",1,700],["s2",2,1700],["s3",3,2900]].forEach(([c,i,t])=>T.push(setTimeout(()=>{st.className="stage rv in "+c;setStep(i)},t)));T.push(setTimeout(loop,5200));toast("Conexión ZYNK simulada — experiencia abierta")};
+loop();
+/* motion: spotlight+tilt, magnetic, glow, progress, parallax */
+document.addEventListener("pointermove",e=>{
+ const gl=$("#glow");if(matchMedia("(pointer:fine)").matches&&!RM){gl.style.opacity=1;gl.style.left=e.clientX+"px";gl.style.top=e.clientY+"px"}
+ const c=e.target.closest(".card");if(c){const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;c.style.setProperty("--x",x+"px");c.style.setProperty("--y",y+"px");if(!RM&&e.pointerType==="mouse")c.style.transform=`perspective(800px) rotateX(${(.5-y/r.height)*5}deg) rotateY(${(x/r.width-.5)*5}deg)`}
+ const m=e.target.closest(".mag");if(m&&!RM&&e.pointerType==="mouse"){const r=m.getBoundingClientRect();m.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.18}px,${(e.clientY-r.top-r.height/2)*.25}px)`}
+ const sc=e.target.closest("#sccard");if(sc&&!RM){const r=sc.getBoundingClientRect();sc.style.transform=`perspective(700px) rotateY(${((e.clientX-r.left)/r.width-.5)*16}deg) rotateX(${(.5-(e.clientY-r.top)/r.height)*16}deg)`}
+ if(st&&!RM&&st.contains(e.target)&&!st.classList.contains("s2")&&!st.classList.contains("s3")){const r=st.getBoundingClientRect();$(".ph",st).style.rotate=((e.clientX-r.left)/r.width-.5)*5+"deg"}});
+document.addEventListener("pointerout",e=>{const c=e.target.closest(".card,.mag,#sccard");if(c)c.style.transform=""});
+addEventListener("scroll",()=>{const d=document.documentElement,m=d.scrollHeight-d.clientHeight;$("#top").style.width=(m>0?d.scrollTop/m*100:0)+"%"},{passive:true});
 
-/* ============================================================
-   Translations
-   ============================================================ */
-const I18N = {
-  en: {
-    guestAccess: "Guest access",
-    openNow: "Open now",
-    closedNow: "Closed now",
-    viewMenu: "View Menu",
-    maps: "Maps",
-    reservations: "Reservations",
-    reviews: "Reviews",
-    wifiSub: "Free for guests",
-    network: "Network",
-    password: "Password",
-    passwordCopied: "Password copied",
-    linkCopied: "Link copied",
-    reviewHeading: "Enjoying your experience?",
-    reviewSub: "Your feedback helps {business} grow.",
-    leaveReview: "Leave a review",
-    share: "Share",
-    poweredBy: "Powered by",
-    menuTitle: "Menu",
-    starters: "Starters",
-    mains: "Main Courses",
-    drinks: "Drinks"
-  },
-  es: {
-    guestAccess: "Acceso para clientes",
-    openNow: "Abierto ahora",
-    closedNow: "Cerrado ahora",
-    viewMenu: "Ver menú",
-    maps: "Mapa",
-    reservations: "Reservas",
-    reviews: "Reseñas",
-    wifiSub: "Gratis para huéspedes",
-    network: "Red",
-    password: "Contraseña",
-    passwordCopied: "Contraseña copiada",
-    linkCopied: "Enlace copiado",
-    reviewHeading: "¿Disfrutando tu experiencia?",
-    reviewSub: "Tu opinión ayuda a {business} a crecer.",
-    leaveReview: "Dejar una reseña",
-    share: "Compartir",
-    poweredBy: "Desarrollado por",
-    menuTitle: "Menú",
-    starters: "Entradas",
-    mains: "Platos Principales",
-    drinks: "Bebidas"
-  }
-};
-
-let currentLang = localStorage.getItem("zynk-language") || "en";
-if(!["en","es"].includes(currentLang)) currentLang = "en";
-
-function hydrateBusiness(){
-  document.documentElement.style.setProperty("--lime", biz.theme.accent || "#CFFF3E");
-  document.title = `${biz.name} · Powered by ZYNK`;
-  const metaDescription = document.querySelector('meta[name="description"]');
-  if(metaDescription) metaDescription.content = `${biz.name} digital guest experience, powered by ZYNK.`;
-
-  document.getElementById("biz-name").textContent = biz.name;
-  document.getElementById("biz-location").textContent = biz.location;
-  document.getElementById("biz-avatar").textContent = biz.avatarInitial || biz.name.charAt(0).toUpperCase();
-  document.getElementById("biz-rating").textContent = Number(biz.rating).toFixed(1);
-  document.getElementById("biz-review-count").textContent = `· ${biz.reviewCount}`;
-  document.getElementById("hero-image").src = biz.heroImage;
-  document.getElementById("hero-image").alt = `${biz.name} — ${biz.location}`;
-
-  document.getElementById("maps-link").href = biz.links.googleMaps;
-  document.getElementById("whatsapp-link").href = biz.links.whatsapp;
-  document.getElementById("instagram-link").href = biz.links.instagram;
-  document.getElementById("reservations-link").href = biz.links.whatsappReservations;
-  document.getElementById("reviews-link").href = biz.links.reviewsUrl;
-  document.getElementById("review-cta-link").href = biz.links.reviewsUrl;
-
-  document.getElementById("wifi-network").textContent = biz.wifi.network;
-  document.getElementById("wifi-password").textContent = biz.wifi.password;
-}
-
-function applyTranslations(){
-  document.querySelectorAll("[data-i18n]").forEach(el=>{
-    const key = el.getAttribute("data-i18n");
-    if(I18N[currentLang][key]) el.textContent = I18N[currentLang][key];
-  });
-  const t = I18N[currentLang];
-  document.documentElement.lang = currentLang;
-  document.getElementById("biz-category").textContent = biz.category[currentLang] || biz.category.en;
-  document.getElementById("biz-status").textContent = biz.status === "open" ? t.openNow : t.closedNow;
-  document.getElementById("review-sub").textContent = t.reviewSub.replace("{business}", biz.name);
-  document.getElementById("wifi-copy-btn").setAttribute("aria-label", currentLang === "es" ? "Copiar contraseña" : "Copy password");
-  document.getElementById("sheet-close-btn").setAttribute("aria-label", currentLang === "es" ? "Cerrar menú" : "Close menu");
-
-  document.getElementById("lang-en").classList.toggle("active", currentLang === "en");
-  document.getElementById("lang-en").setAttribute("aria-pressed", currentLang === "en");
-  document.getElementById("lang-es").classList.toggle("active", currentLang === "es");
-  document.getElementById("lang-es").setAttribute("aria-pressed", currentLang === "es");
-  localStorage.setItem("zynk-language", currentLang);
-  renderMenu(activeCategoryIndex);
-}
-
-document.getElementById("lang-en").addEventListener("click", ()=>{ currentLang="en"; applyTranslations(); });
-document.getElementById("lang-es").addEventListener("click", ()=>{ currentLang="es"; applyTranslations(); });
-
-/* ============================================================
-   Toast helper
-   ============================================================ */
-let toastTimer;
-function showToast(text){
-  const toast = document.getElementById("toast");
-  document.getElementById("toast-text").textContent = text;
-  toast.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=> toast.classList.remove("show"), 2200);
-}
-
-/* ============================================================
-   Wi-Fi card
-   ============================================================ */
-document.getElementById("wifi-toggle-btn").addEventListener("click", ()=>{
-  const card = document.getElementById("wifi-card");
-  const isOpen = card.classList.toggle("open");
-  document.getElementById("wifi-toggle-btn").setAttribute("aria-expanded", String(isOpen));
-  if(isOpen) card.scrollIntoView({ behavior: "smooth", block: "nearest" });
-});
-
-document.getElementById("wifi-copy-btn").addEventListener("click", async ()=>{
-  const pw = biz.wifi.password;
-  try{
-    await navigator.clipboard.writeText(pw);
-  }catch(e){
-    const ta = document.createElement("textarea");
-    ta.value = pw; document.body.appendChild(ta); ta.select();
-    document.execCommand("copy"); document.body.removeChild(ta);
-  }
-  const btn = document.getElementById("wifi-copy-btn");
-  btn.classList.add("copied");
-  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
-  showToast(I18N[currentLang].passwordCopied);
-  setTimeout(()=>{
-    btn.classList.remove("copied");
-    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-  }, 1800);
-});
-
-/* ============================================================
-   Menu bottom sheet
-   ============================================================ */
-let activeCategoryIndex = 0;
-const backdrop = document.getElementById("sheet-backdrop");
-const sheet = document.getElementById("menu-sheet");
-let lastFocusedEl = null;
-
-function openSheet(){
-  lastFocusedEl = document.activeElement;
-  backdrop.classList.add("open");
-  sheet.classList.add("open");
-  sheet.setAttribute("aria-hidden", "false");
-  sheet.inert = false;
-  document.body.classList.add("modal-open");
-  document.getElementById("sheet-close-btn").focus();
-  document.addEventListener("keydown", onSheetKeydown);
-}
-function closeSheet(){
-  backdrop.classList.remove("open");
-  sheet.classList.remove("open");
-  sheet.setAttribute("aria-hidden", "true");
-  sheet.inert = true;
-  document.body.classList.remove("modal-open");
-  document.removeEventListener("keydown", onSheetKeydown);
-  if(lastFocusedEl) lastFocusedEl.focus();
-}
-function onSheetKeydown(e){
-  if(e.key === "Escape") return closeSheet();
-  if(e.key !== "Tab") return;
-
-  const focusable = [...sheet.querySelectorAll('button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])')]
-    .filter(el => el.offsetParent !== null);
-  if(!focusable.length) return;
-  const first = focusable[0];
-  const last = focusable[focusable.length - 1];
-  if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-  else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
-}
-document.getElementById("open-menu-btn").addEventListener("click", openSheet);
-document.getElementById("sheet-close-btn").addEventListener("click", closeSheet);
-backdrop.addEventListener("click", closeSheet);
-
-function renderMenu(catIndex){
-  activeCategoryIndex = catIndex;
-  const t = I18N[currentLang];
-  const categoryLabels = { starters: t.starters, mains: t.mains, drinks: t.drinks };
-
-  const tabsEl = document.getElementById("menu-tabs");
-  tabsEl.innerHTML = "";
-  biz.menu.categories.forEach((cat, i)=>{
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "menu-tab" + (i === catIndex ? " active" : "");
-    b.textContent = categoryLabels[cat.key];
-    b.addEventListener("click", ()=> renderMenu(i));
-    tabsEl.appendChild(b);
-  });
-
-  const listEl = document.getElementById("menu-list");
-  listEl.innerHTML = "";
-  listEl.scrollTop = 0;
-  const cat = biz.menu.categories[catIndex];
-  const title = document.createElement("div");
-  title.className = "menu-cat-title";
-  title.textContent = categoryLabels[cat.key];
-  listEl.appendChild(title);
-
-  cat.items.forEach(item=>{
-    const row = document.createElement("div");
-    row.className = "menu-item";
-    row.innerHTML = `
-      <div>
-        <p class="menu-item-name">${item.name[currentLang]}</p>
-        <p class="menu-item-desc">${item.desc[currentLang]}</p>
-      </div>
-      <div class="menu-item-price">${biz.menu.currency} ${item.price}</div>
-    `;
-    listEl.appendChild(row);
-  });
-}
-
-/* ============================================================
-   Share
-   ============================================================ */
-document.getElementById("share-btn").addEventListener("click", async ()=>{
-  const shareData = {
-    title: biz.name,
-    text: `${biz.name} · ${biz.location}`,
-    url: window.location.href
-  };
-  if(navigator.share){
-    try{ await navigator.share(shareData); }catch(e){ /* user cancelled */ }
-  }else{
-    try{
-      await navigator.clipboard.writeText(shareData.url);
-      showToast(I18N[currentLang].linkCopied);
-    }catch(e){}
-  }
-});
-
-/* ============================================================
-   Init
-   ============================================================ */
-hydrateBusiness();
-applyTranslations();
+/* React Bits / Bencho patterns: split-blur text, rotating text, scramble, click spark, dot grid, scroll velocity, dock nav */
+$$("h1").forEach(h=>{h.classList.remove("rv");h.dataset.o=h.innerHTML});
+function splitH(h){h.innerHTML=h.dataset.o;let i=0;(function w(n){[...n.childNodes].forEach(c=>{if(c.nodeType===3){const f=document.createDocumentFragment();c.textContent.split(/(\s+)/).forEach(t=>{if(!t)return;if(/^\s+$/.test(t)){f.append(" ");return}const s=document.createElement("span");s.className="w";s.textContent=t;s.style.animationDelay=(i++*70)+"ms";f.append(s)});c.replaceWith(f)}else if(c.nodeType===1&&c.tagName!=="BR")w(c)})})(h)}
+const W=["restaurantes","hoteles","gimnasios","barberías","bares y clubs","concesionarias","personas"];let wi=0;const rot=$("#rot");
+if(!RM)setInterval(()=>{wi=(wi+1)%W.length;rot.animate([{transform:"none",opacity:1},{transform:"translateY(-60%)",opacity:0}],{duration:200}).onfinish=()=>{rot.textContent=W[wi];rot.animate([{transform:"translateY(60%)",opacity:0},{transform:"none",opacity:1}],{duration:260,easing:"cubic-bezier(.2,.8,.2,1)"})}},2300);
+document.addEventListener("pointerover",e=>{const h=e.target.closest(".card h3");if(!h||RM||h.dataset.sc)return;h.dataset.sc=1;const o=h.textContent;let n=0;const t=setInterval(()=>{h.textContent=[...o].map((c,i)=>i<n||c===" "?c:"ZYNK01/#<>"[Math.random()*11|0]).join("");if((n+=1.5)>=o.length+1){clearInterval(t);h.textContent=o;delete h.dataset.sc}},28)});
+document.addEventListener("click",e=>{if(RM)return;for(let k=0;k<8;k++){const d=document.createElement("i");d.className="sp";d.style.left=e.clientX+"px";d.style.top=e.clientY+"px";document.body.append(d);const a=k/8*6.283;d.animate([{transform:`rotate(${a}rad) translateY(-4px)`,opacity:1},{transform:`rotate(${a}rad) translateY(-30px)`,opacity:0}],{duration:520,easing:"ease-out"}).onfinish=()=>d.remove()}});
+$("#nav").addEventListener("pointermove",e=>$$("#nav button").forEach(b=>{const r=b.getBoundingClientRect();b.style.transform=`scale(${1+Math.max(0,1-Math.abs(e.clientX-r.left-r.width/2)/110)*.14})`}));
+$("#nav").addEventListener("pointerleave",()=>$$("#nav button").forEach(b=>b.style.transform=""));
+const cv=$("#dots"),cx=cv.getContext("2d");let DW,DH,mx=-999,my=-999,sx=-999,sy=-999,pr=1,tr=1,ly=0;
+function rs(){const d=devicePixelRatio||1;DW=innerWidth;DH=innerHeight;cv.width=DW*d;cv.height=DH*d;cx.setTransform(d,0,0,d,0,0)}rs();addEventListener("resize",rs);
+addEventListener("pointermove",e=>{mx=e.clientX;my=e.clientY});
+addEventListener("scroll",()=>{const d=scrollY-ly;ly=scrollY;tr=1+Math.min(Math.abs(d)/5,8)},{passive:true});
+function tick(){sx+=(mx-sx)*.12;sy+=(my-sy)*.12;cx.clearRect(0,0,DW,DH);const g=34;
+ for(let x=g/2;x<DW;x+=g)for(let y=g/2;y<DH;y+=g){const dx=x-sx,dy=y-sy,d=Math.hypot(dx,dy),f=Math.max(0,1-d/170);cx.fillStyle=f>0?`rgba(201,255,49,${.16+f*.75})`:"rgba(244,246,239,.09)";cx.beginPath();cx.arc(x+dx/(d||1)*f*9,y+dy/(d||1)*f*9,1.1+f*1.9,0,7);cx.fill()}
+ pr+=(tr-pr)*.12;tr+=(1-tr)*.05;const a=$("#mq").getAnimations()[0];if(a)a.playbackRate=pr;requestAnimationFrame(tick)}
+RM?tick=()=>0:tick();if(RM){cx.fillStyle="rgba(244,246,239,.09)"}
+go((location.hash||"#inicio").slice(1),false);setTimeout(ind,150);
 </script>
 </body>
 </html>
