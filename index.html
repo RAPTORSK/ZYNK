@@ -341,6 +341,22 @@ nav button{transition:transform .2s,color .25s}
 @media(max-width:330px){.stage.cine-stage{height:465px}.cine-phone{width:149px}.cine-tag-area{left:-1%;bottom:25%}.cine-detail{max-width:55%}.cine-live{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.cine-ambient,.cine-lock-mesh,.cine-ripple,.cine-signal-dot{animation:none!important}.cine-stage *{transition-duration:.01ms!important;animation-duration:.01ms!important}.demo-step-text{transition:none}}
 
+
+/* Continuous frame motion: direct interpolated styles instead of switching screenshots. */
+.cine-stage.cine-frame-active .cine-phone,
+.cine-stage.cine-frame-active .cine-tag,
+.cine-stage.cine-frame-active .cine-lock,
+.cine-stage.cine-frame-active .cine-connect-note,
+.cine-stage.cine-frame-active .cine-browser,
+.cine-stage.cine-frame-active .cine-signal-line,
+.cine-stage.cine-frame-active .cine-app-action,
+.cine-stage.cine-frame-active .cine-ripple,
+.cine-stage.cine-frame-active .cine-sheet,
+.cine-stage.cine-frame-active .cine-sheet-backdrop {transition:none!important;animation:none!important;}
+.cine-stage.cine-frame-active .cine-app-action {pointer-events:none;}
+.cine-stage.cine-frame-active #cine-sheet {pointer-events:none;}
+/* Keep the pre-existing controls legible while the demonstration plays. */
+.cine-stage.cine-playing #demo-replay{border-color:#c9ff317a;color:var(--lime)}
 </style>
 </head>
 <body>
@@ -583,9 +599,106 @@ const demoHints=[
  {name:"ABRE",text:"La experiencia del negocio se abre dentro del mismo teléfono.",detail:"Web del local abierta"},
  {name:"EXPLORA",text:"Ahora prueba la carta, el Wi-Fi o las reseñas dentro del teléfono.",detail:"Interactúa con la experiencia"}
 ];
-let demoTimers=[], demoIsPlaying=false;
-function cancelDemo(){demoTimers.forEach(clearTimeout);demoTimers=[];demoIsPlaying=false;st.classList.remove("cine-playing")}
-function queueDemo(cb,ms){demoTimers.push(setTimeout(cb,ms))}
+// Single-frame animation clock: each visual element follows the same continuous timeline.
+// The user pressing Play explicitly opts into this sequence, including on devices with
+// reduced-motion settings. Background loops still respect those settings.
+let demoIsPlaying=false, demoFrame=0, demoClockStart=0, demoElapsed=0, demoRunId=0;
+const CINE_DURATION=10400;
+const cinePhone=$("#cine-phone"), cineLock=$(".cine-lock"), cineNote=$("#cine-connect-note"),
+ cineBrowser=$("#cine-browser"), cineTag=$(".cine-tag"), cineSignal=$(".cine-signal-line"),
+ cineSignalDot=$(".cine-signal-dot"), cineBackdrop=$("#cine-sheet-backdrop"),
+ cineSheet=$("#cine-sheet"), cineActions=$$(".cine-app-action"), cineRipples=$$(".cine-ripple");
+const clamp01=n=>Math.min(1,Math.max(0,n));
+const ease01=n=>{n=clamp01(n);return n*n*(3-2*n)};
+const range=(t,a,b)=>ease01((t-a)/(b-a));
+const lerp=(a,b,p)=>a+(b-a)*p;
+const nfmt=n=>Number(n).toFixed(2);
+function resetCineInline(){
+ [cinePhone,cineLock,cineNote,cineBrowser,cineTag,cineSignal,cineSignalDot,cineBackdrop,cineSheet,...cineActions,...cineRipples]
+ .forEach(el=>{el.style.removeProperty('transform');el.style.removeProperty('opacity');});
+ cineNote.style.removeProperty('pointer-events');
+ $("#demo-progress-fill").style.removeProperty('transition');
+ st.classList.remove('cine-frame-active');
+}
+function cancelDemo(){
+ demoRunId++;cancelAnimationFrame(demoFrame);demoFrame=0;demoIsPlaying=false;
+ st.classList.remove('cine-playing');resetCineInline();
+ $("#demo-replay").setAttribute('aria-label','Reproducir la demostración completa');
+}
+function drawCineFrame(t){
+ const approach=range(t,200,2000)*(1-range(t,2850,4200));
+ const detected=range(t,1750,2700)*(1-range(t,3900,4750));
+ const signal=range(t,1550,3300);
+ const open=range(t,4200,6500);
+ const sheet=range(t,7950,9500);
+ const phX=lerp(4,-51,approach)*(1-open);
+ const phY=lerp(5,26,approach)*(1-open);
+ const phRY=lerp(-7,-16,approach)*(1-open);
+ const phRZ=lerp(3,-8,approach)*(1-open);
+ const sc=1+.055*approach;
+ cinePhone.style.transform=`perspective(900px) translate(${nfmt(phX)}px,${nfmt(phY)}px) rotateY(${nfmt(phRY)}deg) rotateZ(${nfmt(phRZ)}deg) scale(${nfmt(sc)})`;
+ cineTag.style.transform=`rotate(${nfmt(-13+8*range(t,1200,2700))}deg) perspective(350px) rotateX(${nfmt(17-8*signal)}deg) scale(${nfmt(1+.045*signal)})`;
+ cineSignal.style.transform=`scaleX(${nfmt(signal)})`;
+ cineSignalDot.style.opacity=nfmt(detected);
+ cineLock.style.opacity=nfmt(1-open);
+ cineLock.style.transform=`translateY(${nfmt(-13*open)}%) scale(${nfmt(1-.05*open)})`;
+ cineNote.style.opacity=nfmt(detected);
+ cineNote.style.transform=`translateY(${nfmt(lerp(-35,0,range(t,1750,2600))-70*range(t,3900,4800))}px) scale(${nfmt(lerp(.92,1,range(t,1750,2600)))})`;
+ cineNote.style.pointerEvents=detected>.85?'auto':'none';
+ cineBrowser.style.transform=`translateY(${nfmt(104*(1-open))}%)`;
+ cineBrowser.style.opacity=nfmt(.9+.1*open);
+ cineActions.forEach((el,i)=>{
+   const visible=range(t,5650+i*230,6600+i*230);
+   el.style.opacity=nfmt(visible);
+   el.style.transform=`translateY(${nfmt(13*(1-visible))}px)`;
+ });
+ cineBackdrop.style.opacity=nfmt(.51*sheet);
+ cineSheet.style.transform=`translateY(${nfmt(103*(1-sheet))}%)`;
+ cineRipples.forEach((el,i)=>{
+  const a=clamp01((t-(1450+i*570)) / 1750);
+  const fade=a>0&&a<1?Math.sin(Math.PI*a)*.63:0;
+  el.style.opacity=nfmt(fade);
+  el.style.transform=`translate(-50%,-50%) scale(${nfmt(.45+1.35*a)})`;
+ });
+ const n=t<1800?0:t<4200?1:t<7200?2:3;
+ if(Number(st.dataset.step)!==n){
+  st.dataset.step=String(n);
+  stepButtons.forEach((b,i)=>{b.classList.toggle('on',i===n);b.setAttribute('aria-pressed',String(i===n))});
+  $("#demo-step-text").textContent=demoHints[n].text;
+  $("#demo-status-label").textContent=String(n+1).padStart(2,'0')+' / 04 · '+demoHints[n].name;
+ }
+ const descriptions=['Acercando el teléfono…','Se ha detectado NFC','Abriendo el navegador…','Explorando la carta digital'];
+ $("#demo-detail").textContent=descriptions[n];
+ $("#demo-progress-fill").style.width=nfmt(Math.max(.6,t/CINE_DURATION*100))+'%';
+}
+function playDemo(){
+ cancelDemo();closeCineSheet();demoStep(0);
+ // Prepare the menu content before the sheet starts rising, without opening it.
+ const data=demoSheets.menu;
+ $("#cine-sheet-kicker").textContent=data.kicker;
+ $("#cine-sheet-title").textContent=data.title;
+ $("#cine-sheet-content").innerHTML=data.html;
+ st.classList.add('cine-playing','cine-frame-active');demoIsPlaying=true;
+ $("#demo-replay").setAttribute('aria-label','Reiniciar la demostración desde el principio');
+ $("#demo-progress-fill").style.transition='none';
+ if(matchMedia('(max-width:959px)').matches)st.scrollIntoView({behavior:RM?'instant':'smooth',block:'center'});
+ let run=demoRunId;
+ demoClockStart=0;demoElapsed=0;
+ drawCineFrame(0);
+ const frame=(now)=>{
+   if(!demoIsPlaying||run!==demoRunId)return;
+   if(!demoClockStart)demoClockStart=now;
+   const t=Math.min(CINE_DURATION,now-demoClockStart);
+   demoElapsed=t;
+   drawCineFrame(t);
+   if(t<CINE_DURATION){demoFrame=requestAnimationFrame(frame)}
+   else {
+     cancelDemo();demoStep(3);openCineSheet('menu');
+     $("#demo-detail").textContent='Carta lista · toca Wi-Fi o reseñas para continuar';
+   }
+ };
+ demoFrame=requestAnimationFrame(frame);
+}
 function closeCineSheet(){st.classList.remove("cine-sheet-open");$$("[data-demo-action]").forEach(el=>el.classList.remove("is-selected"))}
 function demoStep(step){
  const n=Math.max(0,Math.min(3,Number(step)||0)),d=demoHints[n];
@@ -610,16 +723,6 @@ function openCineSheet(kind){
  $$("[data-demo-action]").forEach(el=>el.classList.toggle("is-selected",el.dataset.demoAction===kind));
  st.classList.add("cine-sheet-open");
  $("#demo-detail").textContent=kind==="menu"?"Carta digital abierta":kind==="wifi"?"Wi-Fi disponible":"Acceso a reseñas";
-}
-function playDemo(){
- cancelDemo();closeCineSheet();demoStep(0);demoIsPlaying=true;st.classList.add("cine-playing");
- if(matchMedia("(max-width:959px)").matches) st.scrollIntoView({behavior:RM?"instant":"smooth",block:"center"});
- if(RM){demoStep(3);cancelDemo();return}
- // Choreography starts from the same phone: approach -> NFC notification -> Safari opens -> interactive menu.
- queueDemo(()=>demoStep(1),850);
- queueDemo(()=>demoStep(2),2550);
- queueDemo(()=>demoStep(3),4800);
- queueDemo(()=>{cancelDemo();openCineSheet("menu")},5700);
 }
 $("#demo").addEventListener("click",playDemo);
 $("#demo-replay").addEventListener("click",playDemo);
